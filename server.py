@@ -21,7 +21,6 @@ while True:
 	
 	joystick_values = json.loads(data) # Deserialize the data
 	
-	
 	right = joystick_values[HORIZONTAL] >= DEADZONE # If the joystick is pointing right
 	forward = -joystick_values[VERTICAL] >= DEADZONE # If the joystick is pointing forward
 
@@ -35,8 +34,8 @@ while True:
 		magnitude = 1 # Magnitude can only be from 0-1
 	speed = int(magnitude*255) # Maximum possible speed of a motor
 
-	# The angle of the joystick is measured in radians from the x axis
-	# Ranges from 0 to pi/2
+	# The angle of the joystick in radians from the nearest diagonal line
+	# Ranges from -pi/4 to pi/4
 	angle = 1
 	if(joystick_values[HORIZONTAL] != 0): # Prevents division by zero
 		angle = (abs(math.atan(joystick_values[VERTICAL]/joystick_values[HORIZONTAL])) - math.pi/4) / (math.pi/4) # Calculates the angle of the joystick
@@ -47,25 +46,25 @@ while True:
 		if forward:
 			motor_out[0] = 'f' + str(speed)
 			right_speed = int(angle * speed)
-			motor_out[2] = '{sign}{int}'.format(sign = 'f' if right_speed >= 0 else 'r', int = str(abs(right_speed)))
+			motor_out[2] = '{sign}{int}'.format(sign = 'f' if right_speed >= 0 else 'r', int = abs(right_speed))
 
 		# Moving backward and right
 		else:
 			left_speed = int(angle * speed)
-			motor_out[0] = '{sign}{int}'.format(sign = 'r' if left_speed >= 0 else 'f', int = str(abs(left_speed)))
+			motor_out[0] = '{sign}{int}'.format(sign = 'r' if left_speed >= 0 else 'f', int = abs(left_speed))
 			motor_out[2] = 'r' + str(speed)
 
 	# Moving forward and left
 	elif forward:
 		left_speed = int(angle * speed)
-		motor_out[0] = '{sign}{int}'.format(sign = 'f' if left_speed >= 0 else 'r', int = str(abs(left_speed)))
+		motor_out[0] = '{sign}{int}'.format(sign = 'f' if left_speed >= 0 else 'r', int = abs(left_speed))
 		motor_out[2] = 'f' + str(speed)
 
 	# Moving backward and left
 	else:
 		motor_out[0] = 'r' + str(speed)
 		right_speed = int(angle * speed)
-		motor_out[2] = '{sign}{int}'.format(sign = 'r' if right_speed >= 0 else 'f', int = str(abs(right_speed)))
+		motor_out[2] = '{sign}{int}'.format(sign = 'r' if right_speed >= 0 else 'f', int = abs(right_speed))
 
 	for x in range(1,4,2): # Copies motor speeds on the same side
 		motor_out[x] = motor_out[x-1]
